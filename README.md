@@ -5,7 +5,7 @@
 ## 系統需求
 
 ### Python 環境
-- Python 3.8 或更高版本
+- Python 3.12 或更高版本
 - pip (Python 包管理器)
 
 
