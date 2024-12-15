@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創辦人介紹</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 引入fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="founder.js"></script>
+</head>
+
+<body>
+    <!-- 頂部導航 -->
+    <header class="header">
+        <nav class="navbar">
+            <a href="#" class="nav-logo">五七藝品</a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#" class="nav-link">首頁</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">關於我們</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">聯繫我們</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <!-- 頂部英雄區域 -->
+        <div class="hero">
+            <div class="hero-decoration"></div>
+            <div class="avatar-container">
+                <img src="https://via.placeholder.com/200x200.jpg?text=創辦人照片" alt="創辦人照片" class="avatar">
+            </div>
+        </div>
+
+        <!-- 主要內容區域 -->
+        <div class="content">
+            <!-- 基本信息 -->
+            <div class="profile">
+                <h1>鄒秋蘭</h1>
+                <p class="title">五七藝品 創辦人</p>
+                <p class="nickname">nickname:鄒姐姐</p>
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-line"></i>
+                    </a>
+
+                    <a href="#" class="social-link">
+                        <i class="far fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 個人簡介 -->
+            <div class="section">
+                <h2>關於我</h2>
+                <p>
+                    身為客家人的我，在45歲時經歷了人生的重大轉折 - 罹患肺腺癌。這個經歷讓我深刻體會到生命的
+                    可貴，也促使我更堅定地投入公益與創業的道路。在「五七藝品」（Five Seven）這個平台，我們
+                    不僅展示精美的藝術作品，更致力於將藝術、慈善與在地文化結合，創造共好的社會價值。
+                </p>
+            </div>
+
+            <!-- 使命與價值觀 -->
+            <div class="section">
+                <h2>使命與願景</h2>
+                <p>
+                    秉持「未來由自己創造」的信念，五七藝品致力於實踐「幫助人」與「營利」的平衡。我們重視
+                    與在地小農的合作，建立永續的經營模式，同時也為長者創造就業機會。每兩個月參與一次文創
+                    市集，持續觀察市場需求，確保我們的產品能真正滿足客戶需求，為社會創造更多正面價值。
+                </p>
+            </div>
+
+            <!-- 精選作品 -->
+            <div class="section gallery-section">
+                <h2>精選作品</h2>
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="https://via.placeholder.com/400x400" alt="藝術品1">
+                        <div class="gallery-overlay">
+                            <h3>作品名稱</h3>
+                            <p>作品描述</p>
+                        </div>
+                    </div>
+                    <!-- 可以添加更多作品 -->
+                </div>
+            </div>
+
+            <!-- 最新消息 -->
+            <div class="section news-section">
+                <h2>最新活動</h2>
+                <div class="news-grid">
+                    <div class="news-card">
+                        <div class="news-date">2024/03/20</div>
+                        <h3>慈善藝術展覽</h3>
+                        <p>本月將在台中市舉辦慈善藝術展覽，展出多件精美藝術品...</p>
+                        <a href="#" class="news-link">了解更多</a>
+                    </div>
+                    <!-- 可以添加更多活動 -->
+                </div>
+            </div>
+
+            <!-- 聯繫按鈕 -->
+            <div class="contact">
+                <button id="contactBtn" class="contact-btn">聯繫我</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 懸浮對話按鈕和對話框 -->
+    <div class="chat-widget">
+        <button id="chatToggle" class="chat-toggle">
+            <i class="fas fa-comments"></i>
+        </button>
+
+        <div id="chatPanel" class="chat-panel">
+            <div class="chat-header">
+                <h3>與五七藝品對話</h3>
+                <button class="close-btn" onclick="toggleChat()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chat-body">
+                <div id="response" class="response" style="display: none;"></div>
+                <div id="error" class="error" style="display: none;"></div>
+            </div>
+            <div class="chat-footer">
+                <textarea id="query" class="query-box" placeholder="請輸入您的問題..."></textarea>
+                <button onclick="submitQuery()" class="chat-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <div id="loading" class="loading"></div>
+        </div>
+    </div>
+    <!-- 頁尾區域 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>營業時間</h3>
+                <p>週一至週五：10:00 - 19:00</p>
+                <p>週六至週日：11:00 - 18:00</p>
+            </div>
+            <div class="footer-section">
+                <h3>聯絡資訊</h3>
+                <p><i class="fas fa-map-marker-alt"></i> 臺中市西屯區潮洋里青海南街205號4樓之5</p>
+                <p><i class="fas fa-phone"></i> (02) 1234-5678</p>
+                <p><i class="far fa-envelope"></i> info@fiveseven.com</p>
+            </div>
+            <div class="footer-section">
+                <h3>追蹤我們</h3>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-line"></i></a>
+                    <a href="#"><i class="far fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 五七藝品 版權所有</p>
+        </div>
+    </footer>
+
+    <button id="backToTop" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+</body>
+
+</html>
