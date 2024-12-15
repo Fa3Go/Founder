@@ -132,8 +132,8 @@ python app.py
 ```
 
 ### 2. 訪問網站
-- 開發環境：http://localhost:5000
-- 創辦人頁面：http://localhost:5000/founder
+- 開發環境：http://localhost:5000/index
+- 創辦人頁面：http://localhost:5000 & http://localhost:5000/founder
 
 ## 注意事項
 
