@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LlamaIndex 查詢系統</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .query-box {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .query-box:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .response,
+        .error {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .response.show,
+        .error.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .response {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+        }
+
+        .error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .query-box {
+                padding: 0.75rem;
+            }
+        }
+
+        .file-upload {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .upload-btn {
+            background-color: #4b5563;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background-color: #374151;
+        }
+
+        .file-name {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .vector-settings {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 5px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            outline: none;
+            margin-top: 0.5rem;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+        }
+
+        .history-btn {
+            margin-top: 1rem;
+            background-color: #4b5563;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-btn:hover {
+            background-color: #374151;
+        }
+
+        .history-panel {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .history-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .history-timestamp {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-query {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-response {
+            color: #1f2937;
+        }
+
+        .refresh-btn {
+            padding: 0.25rem 0.75rem;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .refresh-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>AI 問答系統</h1>
+        <div class="file-upload">
+            <input type="file" id="fileInput" accept=".txt,.pdf,.docx,.html,.htm" style="display: none;">
+            <button onclick="document.getElementById('fileInput').click()" class="upload-btn">
+                選擇文件 (支援 .txt, .pdf, .docx, .html)
+            </button>
+            <span id="fileName" class="file-name"></span>
+        </div>
+
+        <div class="vector-settings">
+            <label for="similaritySlider">相關段落數量: <span id="similarityValue">5</span></label>
+            <input type="range" id="similaritySlider" min="1" max="50" step="1" value="5" class="slider">
+            <div class="slider-labels">
+                <span>更精確</span>
+                <span>更全面</span>
+            </div>
+        </div>
+
+        <textarea id="query" class="query-box" placeholder="請輸入您的問題..."></textarea>
+        <button onclick="submitQuery()" class="submit-btn">開始查詢</button>
+        <div id="loading" class="loading"></div>
+        <div id="response" class="response" style="display: none;"></div>
+        <div id="error" class="error" style="display: none;"></div>
+
+        <button onclick="toggleHistory()" class="history-btn">
+            查看歷史記錄
+        </button>
+
+        <div id="historyPanel" class="history-panel" style="display: none;">
+            <div class="history-header">
+                <h2>查詢歷史</h2>
+                <button onclick="refreshHistory()" class="refresh-btn">重新整理</button>
+            </div>
+            <div id="historyContent" class="history-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // 更新滑動條值顯示
+        document.getElementById('similaritySlider').addEventListener('input', function (e) {
+            document.getElementById('similarityValue').textContent = e.target.value;
+        });
+
+        async function submitQuery() {
+            const query = document.getElementById('query').value;
+            const similarityTopK = document.getElementById('similaritySlider').value;
+            const responseDiv = document.getElementById('response');
+            const errorDiv = document.getElementById('error');
+            const loadingDiv = document.getElementById('loading');
+            const submitBtn = document.querySelector('.submit-btn');
+
+            // 重置顯示狀態
+            responseDiv.style.display = 'none';
+            responseDiv.classList.remove('show');
+            errorDiv.style.display = 'none';
+            errorDiv.classList.remove('show');
+
+            // 顯示載入動畫
+            loadingDiv.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        similarity_top_k: similarityTopK
+                    })
+                });
+
+                const data = await response.json();
+
+                // 隱藏載入動畫
+                loadingDiv.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+
+                if (response.ok) {
+                    responseDiv.textContent = data.response;
+                    responseDiv.style.display = 'block';
+                    setTimeout(() => responseDiv.classList.add('show'), 10);
+                } else {
+                    errorDiv.textContent = data.error;
+                    errorDiv.style.display = 'block';
+                    setTimeout(() => errorDiv.classList.add('show'), 10);
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+
+                errorDiv.textContent = '系統錯誤，請稍後再試';
+                errorDiv.style.display = 'block';
+                setTimeout(() => errorDiv.classList.add('show'), 10);
+            }
+        }
+
+        // 支援按下 Enter 鍵提交
+        document.getElementById('query').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                submitQuery();
+            }
+        });
+
+        document.getElementById('fileInput').addEventListener('change', async function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileName').textContent = file.name;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('文件上傳成功！');
+                } else {
+                    alert(data.error || '上傳失敗');
+                }
+            } catch (error) {
+                alert('上傳過程發生錯誤');
+            }
+        });
+
+        async function refreshHistory() {
+            try {
+                const response = await fetch('/history');
+                const data = await response.json();
+
+                const historyContent = document.getElementById('historyContent');
+                historyContent.innerHTML = '';
+
+                data.history.reverse().forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div class="history-timestamp">${item.timestamp}</div>
+                        <div class="history-query">問題：${item.query}</div>
+                        <div class="history-response">回答：${item.response}</div>
+                    `;
+                    historyContent.appendChild(historyItem);
+                });
+            } catch (error) {
+                console.error('獲取歷史記錄失敗:', error);
+            }
+        }
+
+        function toggleHistory() {
+            const historyPanel = document.getElementById('historyPanel');
+            if (historyPanel.style.display === 'none') {
+                historyPanel.style.display = 'block';
+                refreshHistory();
+            } else {
+                historyPanel.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
