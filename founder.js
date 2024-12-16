@@ -32,11 +32,37 @@ document.addEventListener('DOMContentLoaded', function () {
     // 點擊懸浮按鈕時打開對話框
     document.getElementById('chatToggle').addEventListener('click', toggleChat);
 
-    // AI 問答系統功能
+    // 在文件開頭添加 prompt 設定
+    const SYSTEM_PROMPT = `你是五七藝品的智能客服助理。請遵循以下準則回答：
+
+1. 身份：你是「五七藝品」的專業客服代表，請用親切專業的口吻回答。
+
+2. 關於五七藝品：
+- 創辦人是鄒秋蘭（暱稱：鄒姐姐）
+- 是一家結合藝術、慈善與在地文化的社會企業
+- 主要業務包括藝術品展售和社會公益項目
+- 特別重視與在地小農合作，並為長者創造就業機會
+
+3. 回答風格：
+- 使用溫暖友善的語氣
+- 回答要簡潔明瞭
+- 適時使用表情符號增加親和力
+- 使用繁體中文回答
+
+4. 如果遇到：
+- 產品詢問：提供概括性介紹，並邀請客戶實地參觀
+- 價格相關：請客戶直接聯繫門市
+- 合作提案：表達歡迎，並請對方留下聯絡方式
+- 不確定的問題：誠實表明需要進一步確認
+
+5. 結尾：
+- 適時提供門市地址：臺中市西屯區潮洋里青海南街205號4樓之5
+- 營業時間：週一至週五 10:00-19:00，週六至週日 11:00-18:00`;
+
+    // 修改 submitQuery 函數
     async function submitQuery() {
         const query = document.getElementById('query').value;
-        const responseDiv = document.getElementById('response');
-        const errorDiv = document.getElementById('error');
+        const chatMessages = document.querySelector('.chat-messages');
         const loadingDiv = document.getElementById('loading');
         const chatBtn = document.querySelector('.chat-btn');
 
@@ -44,138 +70,64 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('請輸入問題');
             return;
         }
-        async function submitQuery() {
-            const query = document.getElementById('query').value;
-            const chatMessages = document.querySelector('.chat-messages');
-            const loadingDiv = document.getElementById('loading');
-            const chatBtn = document.querySelector('.chat-btn');
 
-            if (!query.trim()) {
-                alert('請輸入問題');
-                return;
-            }
+        // 添加使用者訊息到聊天框
+        const userMessage = document.createElement('div');
+        userMessage.className = 'chat-message user';
+        userMessage.innerHTML = `<p>${query}</p>`;
+        chatMessages.appendChild(userMessage);
 
-            // 添加使用者訊息到聊天框
-            const userMessage = document.createElement('div');
-            userMessage.className = 'chat-message user';
-            userMessage.innerHTML = `<p>${query}</p>`;
-            chatMessages.appendChild(userMessage);
-
-            // 清空輸入框
-            document.getElementById('query').value = '';
-
-            // 顯示載入動畫
-            loadingDiv.style.display = 'block';
-            chatBtn.disabled = true;
-
-            try {
-                // 初始化 Gemini API
-                const genAI = new GoogleGenerativeAI('AIzaSyBUtF_r9ep-w4nwD0wvsOgI3utZDyMH36A');
-                const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-                // 設定系統提示詞
-                const systemPrompt = `
-                你是五七藝品的智能客服助理。請以下列方式回應：
-                
-                1. 身分設定：
-                - 你是「五七藝品」的專業客服人員
-                - 說話風格親切、專業且有禮貌
-                - 使用繁體中文回答
-                
-                2. 關於五七藝品：
-                - 創辦人是鄒秋蘭（暱稱：鄒姐姐）
-                - 主要經營文創藝術品
-                - 結合藝術、慈善與在地文化
-                - 重視社會企業責任
-                - 與在地小農合作
-                - 提供長者就業機會
-                
-                3. 回答原則：
-                - 回答要簡潔有力
-                - 態度要親切有禮
-                - 不確定的資訊要誠實說明
-                - 適時表達關心
-                
-                4. 特殊情況：
-                - 如果遇到投訴，表達歉意並承諾會反映給相關部門
-                - 如果問到價格，建議顧客直接聯繫或參考官網
-                - 如果問到個人隱私，婉轉拒絕回答
-                
-                請根據以上設定來回答用戶的問題：${query}
-                `;
-
-                // 發送請求到 Gemini
-                const result = await model.generateContent(systemPrompt);
-                const response = await result.response;
-                const text = response.text();
-
-                // 添加 AI 回應到聊天框
-                const aiMessage = document.createElement('div');
-                aiMessage.className = 'chat-message assistant';
-                aiMessage.innerHTML = `<p>${text}</p>`;
-                chatMessages.appendChild(aiMessage);
-
-                // 自動滾動到最新訊息
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            } catch (error) {
-                console.error('Error:', error);
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'chat-message error';
-                errorMessage.innerHTML = `<p>抱歉，發生錯誤。請稍後再試。</p>`;
-                chatMessages.appendChild(errorMessage);
-            } finally {
-                // 隱藏載入動畫
-                loadingDiv.style.display = 'none';
-                chatBtn.disabled = false;
-            }
-        }
-
-        // 將 submitQuery 函數添加到全局作用域
-        window.submitQuery = submitQuery;
-
-        // 重置顯示狀態
-        responseDiv.style.display = 'none';
-        errorDiv.style.display = 'none';
+        // 清空輸入框
+        document.getElementById('query').value = '';
 
         // 顯示載入動畫
         loadingDiv.style.display = 'block';
         chatBtn.disabled = true;
 
         try {
-            const response = await fetch('/query', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            // 初始化 Gemini API
+            const genAI = new GoogleGenerativeAI('AIzaSyBUtF_r9ep-w4nwD0wvsOgI3utZDyMH36A');
+            const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+            // 創建聊天內容
+            const chat = model.startChat({
+                history: [],
+                generationConfig: {
+                    maxOutputTokens: 1000,
                 },
-                body: JSON.stringify({
-                    query: query,
-                    similarity_top_k: 5
-                })
             });
 
-            const data = await response.json();
+            // 添加系統 prompt
+            await chat.sendMessage(SYSTEM_PROMPT);
 
+            // 發送使用者問題
+            const result = await chat.sendMessage(query);
+            const response = await result.response;
+            const text = response.text();
+
+            // 添加 AI 回應到聊天框
+            const aiMessage = document.createElement('div');
+            aiMessage.className = 'chat-message assistant';
+            aiMessage.innerHTML = `<p>${text}</p>`;
+            chatMessages.appendChild(aiMessage);
+
+            // 自動滾動到最新訊息
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        } catch (error) {
+            console.error('Error:', error);
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'chat-message error';
+            errorMessage.innerHTML = `<p>抱歉，發生錯誤。請稍後再試。</p>`;
+            chatMessages.appendChild(errorMessage);
+        } finally {
             // 隱藏載入動畫
             loadingDiv.style.display = 'none';
             chatBtn.disabled = false;
-
-            if (response.ok) {
-                responseDiv.textContent = data.response;
-                responseDiv.style.display = 'block';
-                // 自動滾動到最新消息
-                responseDiv.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                errorDiv.textContent = data.error;
-                errorDiv.style.display = 'block';
-            }
-        } catch (error) {
-            loadingDiv.style.display = 'none';
-            chatBtn.disabled = false;
-            errorDiv.textContent = '系統錯誤，請稍後再試';
-            errorDiv.style.display = 'block';
         }
     }
+
+    // 其他現有的程式碼保持不變...
 
     // 將 submitQuery 函數添加到全局作用域
     window.submitQuery = submitQuery;
