@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
 - 適時提供門市地址：臺中市西屯區潮洋里青海南街205號4樓之5
 - 營業時間：週一至週五 10:00-19:00，週六至週日 11:00-18:00`;
 
-    // 修改 submitQuery 函數的實現
+    // 修改 submitQuery 函數
     async function submitQuery() {
         const query = document.getElementById('query').value;
         const chatMessages = document.querySelector('.chat-messages');
@@ -85,32 +85,33 @@ document.addEventListener('DOMContentLoaded', function () {
         chatBtn.disabled = true;
 
         try {
-            // 使用 fetch 直接調用 Gemini API
-            const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', {
+            const apiKey = 'AIzaSyBUtF_r9ep-w4nwD0wvsOgI3utZDyMH36A';
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer AIzaSyBUtF_r9ep-w4nwD0wvsOgI3utZDyMH36A`
                 },
                 body: JSON.stringify({
                     contents: [{
-                        role: 'user',
                         parts: [{
                             text: SYSTEM_PROMPT + '\n\n使用者問題：' + query
                         }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7,
-                        maxOutputTokens: 1000,
-                    }
+                    }]
                 })
             });
 
             if (!response.ok) {
-                throw new Error('API request failed');
+                throw new Error(`API request failed: ${response.status}`);
             }
 
             const data = await response.json();
+
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+                throw new Error('Invalid response format');
+            }
+
             const text = data.candidates[0].content.parts[0].text;
 
             // 添加 AI 回應到聊天框
