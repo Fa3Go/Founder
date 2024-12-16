@@ -5,10 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>創辦人介紹</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <!-- 引入fontawesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="founder.js"></script>
+    <script src="{{ url_for('static', filename='js/founder.js') }}"></script>
 </head>
 
 <body>
@@ -169,7 +175,7 @@
             <h2>最新活動</h2>
             <div class="news-grid">
                 <div class="news-card">
-                    <div class="news-date">2024/03/20</div>
+                    <div class="news-date">2024/12/17</div>
                     <h3>慈善藝術展覽</h3>
                     <p>本月將在台中市舉辦慈善藝術展覽，展出多件精美藝術品...</p>
                     <a href="#" class="news-link">了解更多</a>
