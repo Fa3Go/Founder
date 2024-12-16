@@ -44,6 +44,95 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('請輸入問題');
             return;
         }
+        async function submitQuery() {
+            const query = document.getElementById('query').value;
+            const chatMessages = document.querySelector('.chat-messages');
+            const loadingDiv = document.getElementById('loading');
+            const chatBtn = document.querySelector('.chat-btn');
+
+            if (!query.trim()) {
+                alert('請輸入問題');
+                return;
+            }
+
+            // 添加使用者訊息到聊天框
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chat-message user';
+            userMessage.innerHTML = `<p>${query}</p>`;
+            chatMessages.appendChild(userMessage);
+
+            // 清空輸入框
+            document.getElementById('query').value = '';
+
+            // 顯示載入動畫
+            loadingDiv.style.display = 'block';
+            chatBtn.disabled = true;
+
+            try {
+                // 初始化 Gemini API
+                const genAI = new GoogleGenerativeAI('AIzaSyBUtF_r9ep-w4nwD0wvsOgI3utZDyMH36A');
+                const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+                // 設定系統提示詞
+                const systemPrompt = `
+                你是五七藝品的智能客服助理。請以下列方式回應：
+                
+                1. 身分設定：
+                - 你是「五七藝品」的專業客服人員
+                - 說話風格親切、專業且有禮貌
+                - 使用繁體中文回答
+                
+                2. 關於五七藝品：
+                - 創辦人是鄒秋蘭（暱稱：鄒姐姐）
+                - 主要經營文創藝術品
+                - 結合藝術、慈善與在地文化
+                - 重視社會企業責任
+                - 與在地小農合作
+                - 提供長者就業機會
+                
+                3. 回答原則：
+                - 回答要簡潔有力
+                - 態度要親切有禮
+                - 不確定的資訊要誠實說明
+                - 適時表達關心
+                
+                4. 特殊情況：
+                - 如果遇到投訴，表達歉意並承諾會反映給相關部門
+                - 如果問到價格，建議顧客直接聯繫或參考官網
+                - 如果問到個人隱私，婉轉拒絕回答
+                
+                請根據以上設定來回答用戶的問題：${query}
+                `;
+
+                // 發送請求到 Gemini
+                const result = await model.generateContent(systemPrompt);
+                const response = await result.response;
+                const text = response.text();
+
+                // 添加 AI 回應到聊天框
+                const aiMessage = document.createElement('div');
+                aiMessage.className = 'chat-message assistant';
+                aiMessage.innerHTML = `<p>${text}</p>`;
+                chatMessages.appendChild(aiMessage);
+
+                // 自動滾動到最新訊息
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            } catch (error) {
+                console.error('Error:', error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'chat-message error';
+                errorMessage.innerHTML = `<p>抱歉，發生錯誤。請稍後再試。</p>`;
+                chatMessages.appendChild(errorMessage);
+            } finally {
+                // 隱藏載入動畫
+                loadingDiv.style.display = 'none';
+                chatBtn.disabled = false;
+            }
+        }
+
+        // 將 submitQuery 函數添加到全局作用域
+        window.submitQuery = submitQuery;
 
         // 重置顯示狀態
         responseDiv.style.display = 'none';
